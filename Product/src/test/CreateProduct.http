@@ -1,0 +1,31 @@
+GET http://localhost:8080/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "creditIds": [1,2]
+}
+
+###
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "productName": "name",
+  "value": 12,
+  "creditId": 1
+}
+
+###
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "productName": "name",
+  "value": 12,
+  "creditId": 2
+}
+
+###

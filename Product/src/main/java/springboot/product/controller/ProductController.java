@@ -1,13 +1,12 @@
 package springboot.product.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import springboot.product.controller.request.CreditNumbers;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import springboot.product.controller.request.CreditNumbersRequest;
+import springboot.product.controller.request.ProductRequest;
+import springboot.product.controller.response.ProductResponse;
 import springboot.product.controller.response.ProductsResponse;
-import springboot.product.dto.ProductDto;
 import springboot.product.mapper.ProductMapper;
 import springboot.product.service.ProductService;
 
@@ -16,22 +15,27 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
+@RequestMapping(path = "/", produces = "application/json")
 public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
 
     @GetMapping
-    public ProductsResponse getProducts(@RequestBody CreditNumbers creditNumbers) {
-        List<ProductDto> productDtoList = productService.getProducts(creditNumbers.getNumbers()).stream()
-                .map(productMapper::map)
+    @ResponseStatus(HttpStatus.OK)
+    public ProductsResponse getProducts(@RequestBody CreditNumbersRequest creditNumbersRequest) {
+        List<ProductResponse> productsResponseList = productService
+                .getProducts(creditNumbersRequest.getCreditIds())
+                .stream()
+                .map(productMapper::mapToResponse)
                 .collect(Collectors.toList());
         return ProductsResponse.builder()
-                .products(productDtoList)
+                .products(productsResponseList)
                 .build();
     }
 
     @PostMapping
-    public void createProduct(@RequestBody ProductDto productDto) {
-        productService.createProduct(productMapper.map(productDto));
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createProduct(@RequestBody ProductRequest productRequest) {
+        productService.createProduct(productMapper.mapToDto(productRequest));
     }
 }

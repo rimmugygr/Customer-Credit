@@ -1,4 +1,4 @@
-package springboot.product.service;
+package springboot.customer.service;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -9,50 +9,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import springboot.product.dto.ProductDto;
-import springboot.product.mapper.ProductMapper;
-import springboot.product.model.Product;
-import springboot.product.repository.ProductRepository;
+import springboot.customer.dto.CustomerDto;
+import springboot.customer.mapper.CustomerMapper;
+import springboot.customer.model.Customer;
+import springboot.customer.repository.CustomerRepository;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@Import(ProductService.class)
+@Import(CustomerService.class)
 @ExtendWith(SpringExtension.class)
-class ProductServiceTest {
+class CustomerServiceTest {
     @Autowired
-    ProductService productService;
+    CustomerService productService;
 
     @MockBean
-    ProductRepository mockRepository;
+    CustomerRepository mockRepository;
 
     @MockBean
-    ProductMapper mockMapper;
+    CustomerMapper mockMapper;
 
-    @DisplayName("getProductsByCreditIds")
+    @DisplayName("getCustomersByCreditIds")
     @Nested
-    class GetProduct {
+    class GetCustomer {
         List<Integer> creditNumberList;
-        Product product1;
-        Product product2;
-        List<Product> productList;
+        Customer product1;
+        Customer product2;
+        List<Customer> productList;
 
         @BeforeEach
         void setUp() throws Exception {
             //given
             creditNumberList = List.of(1,2);
-            product1 = Product.builder()
-                    .id(2)
-                    .productName("aaa")
-                    .value(312)
-                    .creditId(1)
-                    .build();
-            product2 = Product.builder()
-                    .id(3)
-                    .productName("aaa")
-                    .value(312)
+            product1 = Customer.builder()
                     .creditId(2)
+                    .id(3)
+                    .firstName("asdasd1")
+                    .surname("surname1")
+                    .pesel("734321")
+                    .build();
+            product2 = Customer.builder()
+                    .creditId(1)
+                    .id(4)
+                    .firstName("asdasd2")
+                    .surname("surname2")
+                    .pesel("73432")
                     .build();
             productList = List.of(product1, product2);
             Mockito.when(mockRepository.findAllByCreditIdIn(creditNumberList))
@@ -68,7 +68,7 @@ class ProductServiceTest {
         @Test
         void shouldGetListProductWhenProvideListOfId() {
             //when
-            List<Product> products = productService.getProducts(creditNumberList);
+            List<Customer> products = productService.getCustomersByCreditIds(creditNumberList);
             //then
             MatcherAssert.assertThat(products, Matchers.notNullValue());
             MatcherAssert.assertThat(products, Matchers.contains(product1, product2));
@@ -77,35 +77,35 @@ class ProductServiceTest {
         @Test
         void shouldInvokeRepositoryForProductsWhenProvideListOfId() {
             //when
-            productService.getProducts(creditNumberList);
+            productService.getCustomersByCreditIds(creditNumberList);
             //then
             Mockito.verify(mockRepository).findAllByCreditIdIn(creditNumberList);
         }
     }
 
-    @DisplayName("createProduct")
+    @DisplayName("createCustomer")
     @Nested
-    class CreateProduct {
-        ProductDto productDto;
-        Product product;
+    class CreateCustomer {
+        CustomerDto anyCustomerDto;
+        Customer anyCustomer;
 
         @BeforeEach
         void setUp() throws Exception {
             //given
-            product = Product.builder()
-                    .id(2)
-                    .productName("aaa")
-                    .value(312)
-                    .creditId(1)
+            anyCustomerDto = CustomerDto.builder()
+                    .creditId(2)
+                    .firstName("asdasd")
+                    .surname("surname")
+                    .pesel("73432")
                     .build();
-            productDto = ProductDto.builder()
-                    .id(2)
-                    .productName("aaa")
-                    .value(312)
-                    .creditId(1)
+            anyCustomer = Customer.builder()
+                    .creditId(2)
+                    .firstName("asdasd")
+                    .surname("surname")
+                    .pesel("73432")
                     .build();
-            Mockito.when(mockMapper.map(productDto))
-                    .thenReturn(product);
+            Mockito.when(mockMapper.map(anyCustomerDto))
+                    .thenReturn(anyCustomer);
         }
 
         @AfterEach
@@ -115,14 +115,12 @@ class ProductServiceTest {
         }
 
         @Test
-        void shouldCreateProductWhenProvideProduct() {
+        void shouldCreateCustomerWhenProvidedAnyCustomer() {
             //when
-            productService.createProduct(productDto);
+            productService.createCustomer(anyCustomer);
             //then
-            Mockito.verify(mockRepository).save(product);
+            Mockito.verify(mockRepository).save(anyCustomer);
         }
     }
-
-
 
 }

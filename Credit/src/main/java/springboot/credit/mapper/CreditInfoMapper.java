@@ -1,11 +1,11 @@
 package springboot.credit.mapper;
 
 import org.mapstruct.Mapper;
-import springboot.credit.dto.CreditDto;
-import springboot.credit.model.Credit;
+import springboot.credit.dto.CreditInfoDto;
+import springboot.credit.model.CreditInfo;
 
 @Mapper(componentModel = "spring")
-public interface CreditMapper {
-    Credit map(CreditDto creditDto);
-    CreditDto map(Credit credit);
+public interface CreditInfoMapper {
+    CreditInfo map(CreditInfoDto creditInfoDto);
+    CreditInfoDto map(CreditInfo creditInfo);
 }

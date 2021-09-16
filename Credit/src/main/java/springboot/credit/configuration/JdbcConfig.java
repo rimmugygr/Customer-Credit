@@ -1,4 +1,4 @@
-package springboot.product.configuration;
+package springboot.credit.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableJdbcRepositories("springboot.product.repository")
+@EnableJdbcRepositories("springboot.credit.repository")
 public class JdbcConfig extends AbstractJdbcConfiguration {
     // NamedParameterJdbcOperations is used internally to submit SQL statements to the database
     @Bean
@@ -30,7 +30,7 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/productdb?serverTimezone=UTC");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/creditdb?serverTimezone=UTC");
         dataSource.setUsername("user");
         dataSource.setPassword("1234qwer!@#$QWER");
         return dataSource;

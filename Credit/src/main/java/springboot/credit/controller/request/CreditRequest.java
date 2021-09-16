@@ -1,18 +1,24 @@
-package springboot.credit.controller.response;
+package springboot.credit.controller.request;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-public class CreditResponse {
-    private final Credit credit;
-    private final Product product;
-    private final Customer customer;
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreditRequest {
+    private Credit credit;
+    private Product product;
+    private Customer customer;
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Customer {
         private String firstName;
         private String surname;
@@ -21,6 +27,8 @@ public class CreditResponse {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Product {
         private String productName;
         private Integer value;
@@ -28,6 +36,8 @@ public class CreditResponse {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Credit {
         private String creditName;
     }

@@ -1,11 +1,12 @@
 package springboot.customer.controller.response;
 
 import lombok.Builder;
-import springboot.customer.dto.CustomerDto;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 @Builder
-public class CustomerListResponse {
-    private final List<CustomerDto> customers;
+public class CustomersResponse {
+    private final List<CustomerResponse> customers;
 }

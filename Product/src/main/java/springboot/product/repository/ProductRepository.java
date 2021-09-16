@@ -5,6 +5,7 @@ import springboot.product.model.Product;
 
 import java.util.List;
 
+
 public interface ProductRepository extends CrudRepository<Product, Long> {
-    public List<Product> findAllByCreditID(List<Integer> creditNumberList);
+    public List<Product> findAllByCreditIdIn(List<Integer> creditNumberList);
 }

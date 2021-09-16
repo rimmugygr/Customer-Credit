@@ -1,4 +1,4 @@
-package springboot.product.controller;
+package springboot.customer.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -14,21 +14,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import springboot.product.controller.request.CreditNumbersRequest;
-import springboot.product.controller.request.ProductRequest;
-import springboot.product.controller.response.ProductResponse;
-import springboot.product.controller.response.ProductsResponse;
-import springboot.product.dto.ProductDto;
-import springboot.product.mapper.ProductMapper;
-import springboot.product.model.Product;
-import springboot.product.service.ProductService;
+import springboot.customer.controller.request.CreditNumbersRequest;
+import springboot.customer.controller.response.CustomerResponse;
+import springboot.customer.controller.response.CustomersResponse;
+import springboot.customer.dto.CustomerDto;
+import springboot.customer.mapper.CustomerMapper;
+import springboot.customer.model.Customer;
+import springboot.customer.service.CustomerService;
 
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class ProductControllerTest {
+class CustomerControllerTest {
 
     @Autowired
     MockMvc mvc;
@@ -37,34 +36,36 @@ class ProductControllerTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    ProductService mockService;
+    CustomerService mockService;
 
     @MockBean
-    ProductMapper mockMapper;
-
+    CustomerMapper mockMapper;
 
     @DisplayName("when data POST /")
     @Nested
-    class PostProduct {
-        ProductRequest productRequest;
-        ProductDto productDto;
-        String productRequestJson;
+    class PostCustomer {
+        CustomerDto customerDto;
+        Customer customer;
+        String customerDtoRequestJson;
+
         @BeforeEach
         void setUp() throws Exception {
             //given
-            productRequest = ProductRequest.builder()
-                    .productName("name")
-                    .value(123)
-                    .creditId(21)
+            customerDto = CustomerDto.builder()
+                    .creditId(2)
+                    .firstName("name")
+                    .surname("surname")
+                    .pesel("12323432")
                     .build();
-            productDto = ProductDto.builder()
-                    .productName("name")
-                    .value(123)
-                    .creditId(21)
+            customer = Customer.builder()
+                    .creditId(2)
+                    .firstName("name")
+                    .surname("surname")
+                    .pesel("12323432")
                     .build();
-            productRequestJson = objectMapper.writeValueAsString(productRequest);
-            Mockito.when(mockMapper.mapToDto(productRequest))
-                    .thenReturn(productDto);
+            customerDtoRequestJson = objectMapper.writeValueAsString(customerDto);
+            Mockito.when(mockMapper.map(customerDto))
+                    .thenReturn(customer);
         }
 
         @AfterEach
@@ -74,22 +75,22 @@ class ProductControllerTest {
         }
 
         @Test
-        void shouldCreateProductWhenProvideProduct() throws Exception {
+        void shouldCreateCustomerWhenProvideCustomer() throws Exception {
             //when
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.post("/")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(productRequestJson));
+                            .content(customerDtoRequestJson));
             //then
-            Mockito.verify(mockService).createProduct(productDto);
+            Mockito.verify(mockService).createCustomer(customer);
         }
         @Test
-        void shouldResponseCreateStatusWhenProductIsCreated() throws Exception {
+        void shouldResponseCreateStatusWhenCustomerIsCreated() throws Exception {
             //when
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.post("/")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(productRequestJson));
+                            .content(customerDtoRequestJson));
             //then
             result.andExpect(MockMvcResultMatchers.status().isCreated());
         }
@@ -97,43 +98,45 @@ class ProductControllerTest {
 
     @DisplayName("when data GET /")
     @Nested
-    class GetProduct {
+    class GetCustomer {
         CreditNumbersRequest creditNumbersRequest;
         List<Integer> creditNumberList;
         String creditNumbersRequestJson;
-        Product product;
-        List<Product> productList;
-        ProductResponse productResponse;
-        ProductsResponse productsResponse;
-        String productsResponseJson;
+        Customer customer;
+        List<Customer> productList;
+        CustomersResponse customersResponse;
+        CustomerResponse customerResponse;
+        String customersResponseJson;
+
         @BeforeEach
         void setUp() throws Exception {
             //given
-            creditNumberList = List.of(1);
+            creditNumberList = List.of(2);
             creditNumbersRequest = CreditNumbersRequest.builder()
                     .creditIds(creditNumberList)
                     .build();
-            product = Product.builder()
-                    .id(1)
-                    .creditId(1)
-                    .productName("name")
-                    .value(12)
+            customer = Customer.builder()
+                    .creditId(2)
+                    .firstName("name")
+                    .surname("surname")
+                    .pesel("12323432")
                     .build();
-            productList = List.of(product);
-            productResponse = ProductResponse.builder()
-                    .creditId(1)
-                    .productName("name")
-                    .value(12)
+            productList = List.of(customer);
+            customerResponse = CustomerResponse.builder()
+                    .creditId(2)
+                    .firstName("name")
+                    .surname("surname")
+                    .pesel("12323432")
                     .build();
-            productsResponse = ProductsResponse.builder()
-                    .products(List.of(productResponse))
+            customersResponse = CustomersResponse.builder()
+                    .customers(List.of(customerResponse))
                     .build();
             creditNumbersRequestJson = objectMapper.writeValueAsString(creditNumbersRequest);
-            productsResponseJson = objectMapper.writeValueAsString(productsResponse);
-            Mockito.when(mockService.getProducts(creditNumberList))
+            customersResponseJson = objectMapper.writeValueAsString(customersResponse);
+            Mockito.when(mockService.getCustomersByCreditIds(creditNumberList))
                     .thenReturn(productList);
-            Mockito.when(mockMapper.mapToResponse(product))
-                    .thenReturn(productResponse);
+            Mockito.when(mockMapper.mapToResponse(customer))
+                    .thenReturn(customerResponse);
         }
 
         @AfterEach
@@ -143,17 +146,17 @@ class ProductControllerTest {
         }
 
         @Test
-        void shouldGetProductsWhenProvideListOfCreditsId() throws Exception {
+        void shouldGetCustomersWhenProvideListOfCreditsId() throws Exception {
             //when
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.get("/")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(creditNumbersRequestJson));
             //then
-            Mockito.verify(mockService).getProducts(creditNumberList);
+            Mockito.verify(mockService).getCustomersByCreditIds(creditNumberList);
         }
         @Test
-        void shouldResponseListProductsWhenProductsIsFinds() throws Exception {
+        void shouldResponseListCustomersWhenCustomersIsFound() throws Exception {
             //when
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.get("/")
@@ -161,10 +164,10 @@ class ProductControllerTest {
                             .content(creditNumbersRequestJson));
             //then
             result.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
-            result.andExpect(MockMvcResultMatchers.content().json(productsResponseJson));
+            result.andExpect(MockMvcResultMatchers.content().json(customersResponseJson));
         }
         @Test
-        void shouldResponseOkStatusWhenProductsIsFinds() throws Exception {
+        void shouldResponseStatusOkWhenCustomersIsFound() throws Exception {
             //when
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.get("/")
@@ -174,5 +177,4 @@ class ProductControllerTest {
             result.andExpect(MockMvcResultMatchers.status().isOk());
         }
     }
-
 }

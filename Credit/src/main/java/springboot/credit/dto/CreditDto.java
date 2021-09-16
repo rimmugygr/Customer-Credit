@@ -1,36 +1,19 @@
-package springboot.credit.controller.response;
+package springboot.credit.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-public class CreditInfoResponse {
-    private final Credit credit;
-    private final Product product;
-    private final Customer customer;
-
-    @Data
-    @Builder
-    public static class Customer {
-        private String firstName;
-        private String surname;
-        private String pesel;
-    }
-
-    @Data
-    @Builder
-    public static class Product {
-        private String productName;
-        private Integer value;
-    }
-
-    @Data
-    @Builder
-    public static class Credit {
-        private String creditName;
-    }
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreditDto {
+    private CreditInfoDto credit;
+    private ProductDto product;
+    private CustomerDto customer;
 }
 
 

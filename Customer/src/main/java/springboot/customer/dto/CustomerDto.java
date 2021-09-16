@@ -1,6 +1,7 @@
-package springboot.customer.model;
+package springboot.customer.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -8,9 +9,10 @@ import org.springframework.data.annotation.Id;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Customer {
-    @Id
+@Builder
+public class CustomerDto {
     private Integer id;
+    private Integer creditId;
     private String firstName;
     private String surname;
     private String pesel;

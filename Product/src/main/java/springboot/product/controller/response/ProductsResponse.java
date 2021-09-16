@@ -2,11 +2,12 @@ package springboot.product.controller.response;
 
 
 import lombok.Builder;
-import springboot.product.dto.ProductDto;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 @Builder
 public class ProductsResponse {
-    private final List<ProductDto> products;
+    private final List<ProductResponse> products;
 }

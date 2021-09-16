@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Credit {
+@Table("credit")
+public class CreditInfo {
     @Id
     private Integer id;
     private String creditName;

@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import springboot.credit.dto.CustomerDto;
+import springboot.credit.dto.ProductDto;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomersResponse {
-    private List<CustomerDto> customers;
+public class ProductsResponse {
+    private List<ProductDto> products;
 }
