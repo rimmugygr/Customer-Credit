@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreditRequest {
-    private Credit credit;
+    private CreditInfo credit;
     private Product product;
     private Customer customer;
 
@@ -38,7 +38,7 @@ public class CreditRequest {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Credit {
+    public static class CreditInfo {
         private String creditName;
     }
 }

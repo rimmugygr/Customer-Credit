@@ -3,11 +3,9 @@ package springboot.credit.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import springboot.credit.dto.CreditDto;
+import springboot.credit.dto.CreditInfoDto;
 import springboot.credit.dto.CustomerDto;
 import springboot.credit.dto.ProductDto;
-import springboot.credit.mapper.CreditInfoMapper;
-import springboot.credit.model.CreditInfo;
-import springboot.credit.repository.CreditInfoRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +15,10 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CreditService {
-    private final CreditInfoRepository creditInfoRepository;
     private final CustomerService customerService;
     private final ProductService productService;
-    private final CreditInfoMapper creditInfoMapper;
+    private final CreditInfoService creditInfoService;
+
 
     public Integer createCredit(CreditDto creditDto){
         Integer newCreditId = Math.toIntExact(UUID.randomUUID().getLeastSignificantBits());
@@ -28,62 +26,74 @@ public class CreditService {
         productService.createProduct(creditDto.getProduct());
         customerService.createCustomer(creditDto.getCustomer());
 
-        CreditInfo newCreditInfoWithId = CreditInfo.builder()
-                .id(newCreditId)
-                .creditName(creditDto.getCredit().getCreditName())
-                .build();
-        saveCreditInfo(newCreditInfoWithId);
+        CreditInfoDto creditInfo = creditDto.getCredit();
+        creditInfo.setId(newCreditId);
+        creditInfoService.saveCreditInfo(creditInfo);
 
         return newCreditId;
     }
 
     public List<CreditDto> getAllCredits() {
-        List<CreditInfo> creditsInfoAll = getAllCreditInfos();
-        List<Integer> creditsNumberAll = creditsInfoAll.stream().map(CreditInfo::getId).collect(Collectors.toList());
+        List<CreditInfoDto> creditsInfoAll = creditInfoService.getCreditInfos();
+
+        List<Integer> creditsNumberAll = creditsInfoAll.stream().map(CreditInfoDto::getId).collect(Collectors.toList());
 
         List<CustomerDto> customersAll = customerService.getCustomers(creditsNumberAll);
         List<ProductDto> productsAll = productService.getProducts(creditsNumberAll);
 
-        return aggregationInformationOfCredit(creditsInfoAll, customersAll, productsAll);
+        return getCreditListAggregationByCreditNumber(creditsInfoAll, customersAll, productsAll);
     }
 
-    public List<CreditInfo> getAllCreditInfos() {
-        List<CreditInfo> creditInfoList = new ArrayList<>();
-        creditInfoRepository.findAll()
-                .iterator()
-                .forEachRemaining(creditInfoList::add);
-        return creditInfoList;
-    }
 
-    public void saveCreditInfo(CreditInfo creditInfo) {
-        creditInfoRepository.save(creditInfo);
-    }
-
-    private List<CreditDto> aggregationInformationOfCredit(List<CreditInfo> creditsInfoAll,
-                                                           List<CustomerDto> customersAll,
-                                                           List<ProductDto> productsAll) {
+    private List<CreditDto> getCreditListAggregationByCreditNumber(List<CreditInfoDto> creditsInfoAll,
+                                                                   List<CustomerDto> customersAll,
+                                                                   List<ProductDto> productsAll) {
         List<CreditDto> credits = new ArrayList<>();
 
-        for (CreditInfo creditInfo : creditsInfoAll) {
-            CustomerDto customerForThisCredit = customersAll.stream()
-                    .filter(x -> x.getCreditId().equals(creditInfo.getId()))
-                    .findFirst()
-                    .get();
-            customersAll.remove(customerForThisCredit);
-
-            ProductDto productForThisCredit = productsAll.stream()
-                    .filter(x -> x.getCreditId().equals(creditInfo.getId()))
-                    .findFirst()
-                    .get();
-            productsAll.remove(productForThisCredit);
-
-            CreditDto build = CreditDto.builder()
-                    .credit(creditInfoMapper.map(creditInfo))
-                    .customer(customerForThisCredit)
-                    .product(productForThisCredit)
-                    .build();
+        for (CreditInfoDto creditInfoDto : creditsInfoAll) {
+            CreditDto build = getCreditAggregationByCreditNumber(customersAll, productsAll, creditInfoDto);
             credits.add(build);
         }
         return credits;
+    }
+
+    private CreditDto getCreditAggregationByCreditNumber(List<CustomerDto> customersAll,
+                                                         List<ProductDto> productsAll,
+                                                         CreditInfoDto creditInfoDto) {
+        Integer creditNumber = creditInfoDto.getId();
+
+        CustomerDto customerForThisCredit = getCustomerFromListByCreditNumber(customersAll, creditNumber);
+
+        ProductDto productForThisCredit = getProductFromListByCreditNumber(productsAll, creditNumber);
+
+        return CreditDto.builder()
+                .credit(creditInfoDto)
+                .customer(customerForThisCredit)
+                .product(productForThisCredit)
+                .build();
+    }
+
+    // return first product from list by credit number and remove this product from list
+    private ProductDto getProductFromListByCreditNumber(List<ProductDto> productsAll, Integer creditNumber) {
+        ProductDto productForThisCredit = productsAll.stream()
+                .filter(x -> x.getCreditId().equals(creditNumber))
+                .findFirst()
+                .get();
+
+        productsAll.remove(productForThisCredit);
+
+        return productForThisCredit;
+    }
+
+    // return first customer from list by credit number and remove this customer from list
+    private CustomerDto getCustomerFromListByCreditNumber(List<CustomerDto> customersAll, Integer creditNumber) {
+        CustomerDto customerForThisCredit = customersAll.stream()
+                .filter(x -> x.getCreditId().equals(creditNumber))
+                .findFirst()
+                .get();
+
+        customersAll.remove(customerForThisCredit);
+
+        return customerForThisCredit;
     }
 }
