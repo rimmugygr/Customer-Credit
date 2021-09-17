@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import springboot.credit.model.CreditInfo;
 
 @Repository
-public interface CreditInfoRepository extends CrudRepository<CreditInfo, Long> {
+public interface CreditInfoRepository extends CrudRepository<CreditInfo, Integer> {
 }

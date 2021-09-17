@@ -27,6 +27,7 @@ class ProductRepositoryTest {
     @Test
     void shouldSaveNewProductWithIncrementedId() {
         //given
+        entities().forEach(productRepository::save);
         Product product = Product.builder()
                 .creditId(4)
                 .value(11)

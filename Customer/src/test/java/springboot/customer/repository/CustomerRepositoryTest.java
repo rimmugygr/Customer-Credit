@@ -42,6 +42,7 @@ class CustomerRepositoryTest {
     @Test
     void shouldSaveNewCustomerWithIncrementedId() {
         //given
+        entities().forEach(customerRepository::save);
         Customer product = Customer.builder()
                 .creditId(4)
                 .firstName("aaaa")

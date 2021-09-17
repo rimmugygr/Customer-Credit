@@ -159,7 +159,7 @@ class CreditControllerTest {
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.get("/"));
             //then
-            result.andExpect(MockMvcResultMatchers.status().isCreated());
+            result.andExpect(MockMvcResultMatchers.status().isOk());
         }
     }
 }

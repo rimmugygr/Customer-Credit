@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table("credit")
+@Table("CREDIT")
 public class CreditInfo {
     @Id
     private Integer id;
