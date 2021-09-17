@@ -9,7 +9,6 @@ import springboot.credit.dto.ProductDto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,12 +17,16 @@ public class CreditService {
     private final CustomerService customerService;
     private final ProductService productService;
     private final CreditInfoService creditInfoService;
+    private final NewCreditIdService creditIdService;
 
 
     public Integer createCredit(CreditDto creditDto){
-        Integer newCreditId = Math.toIntExact(UUID.randomUUID().getLeastSignificantBits());
+        Integer newCreditId = creditIdService.getNewCreditId();
 
+        creditDto.getProduct().setCreditId(newCreditId);
         productService.createProduct(creditDto.getProduct());
+
+        creditDto.getCustomer().setCreditId(newCreditId);
         customerService.createCustomer(creditDto.getCustomer());
 
         CreditInfoDto creditInfo = creditDto.getCredit();
@@ -36,7 +39,9 @@ public class CreditService {
     public List<CreditDto> getAllCredits() {
         List<CreditInfoDto> creditsInfoAll = creditInfoService.getCreditInfos();
 
-        List<Integer> creditsNumberAll = creditsInfoAll.stream().map(CreditInfoDto::getId).collect(Collectors.toList());
+        List<Integer> creditsNumberAll = creditsInfoAll.stream()
+                .map(CreditInfoDto::getId)
+                .collect(Collectors.toList());
 
         List<CustomerDto> customersAll = customerService.getCustomers(creditsNumberAll);
         List<ProductDto> productsAll = productService.getProducts(creditsNumberAll);
@@ -96,4 +101,6 @@ public class CreditService {
 
         return customerForThisCredit;
     }
+
+
 }

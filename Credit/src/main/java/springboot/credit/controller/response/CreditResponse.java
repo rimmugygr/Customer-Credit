@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreditResponse {
-    private final CreditInfo credit;
-    private final Product product;
-    private final Customer customer;
+    private CreditInfo credit;
+    private Product product;
+    private Customer customer;
 
     @Data
     @Builder
