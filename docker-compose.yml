@@ -1,21 +1,22 @@
-
 version : '3'
 
 services:
   mysql:
     image: mysql:latest
-    container_name: dev_mysql
+    container_name: mysql
     environment:
       MYSQL_USER: user
       MYSQL_PASSWORD: user
       MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: teamdb
+      MYSQL_DATABASE: creditdb
     ports:
       - 3306:3306
+    volumes:
+      - ./db/mysql/init:/docker-entrypoint-initdb.d/:ro
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: dev_mysql_view
+    container_name: mysql_view
     links:
       - mysql
     environment:
@@ -25,3 +26,30 @@ services:
     restart: always
     ports:
       - 8090:80
+      
+  # credit:
+    # build: ./credit
+    # container_name: credit
+   # # links:
+     # # - mysql
+   # # restart: always
+    # ports:
+    # - 8080:8080
+
+  # product:
+    # build: ./product
+    # container_name: product
+   # # links:
+     # # - mysql
+   # # restart: always
+    # ports:
+      # - 8081:8081
+      
+  # customer:
+    # build: ./customer
+    # container_name: customer
+   # # links:
+     # # - mysql
+   # # restart: always
+    # ports:
+      # - 8082:8082

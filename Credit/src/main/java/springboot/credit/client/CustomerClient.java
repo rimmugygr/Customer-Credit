@@ -15,11 +15,11 @@ public class CustomerClient {
 
 
     public void createCustomer(CustomerDto customer) {
-        restTemplate.postForLocation("/",customer);
+        restTemplate.postForLocation("http://customer:8080",customer);
     }
 
     public List<CustomerDto> getCustomers(List<Integer> creditsNumber) {
-        CustomersResponse customers = restTemplate.getForObject("/", CustomersResponse.class, creditsNumber);
+        CustomersResponse customers = restTemplate.getForObject("http://customer:8080", CustomersResponse.class, creditsNumber);
         assert customers != null;
         return customers.getCustomers();
     }

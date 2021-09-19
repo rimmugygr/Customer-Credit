@@ -14,11 +14,11 @@ public class ProductClient {
     private final RestTemplate restTemplate;
 
     public void createProduct(ProductDto product) {
-        restTemplate.postForLocation("/",product);
+        restTemplate.postForLocation("http://product:8080",product);
     }
 
     public List<ProductDto> getProducts(List<Integer> creditsNumber) {
-        ProductsResponse customers = restTemplate.getForObject("/", ProductsResponse.class, creditsNumber);
+        ProductsResponse customers = restTemplate.getForObject("http://product:8080", ProductsResponse.class, creditsNumber);
         assert customers != null;
         return customers.getProducts();
     }
