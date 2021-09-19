@@ -1,19 +1,14 @@
 package springboot.credit.dto;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
 public class CreditDto {
-    private CreditInfoDto credit;
-    private ProductDto product;
-    private CustomerDto customer;
+    private Integer id;
+    private String creditName;
+
 }
-
-

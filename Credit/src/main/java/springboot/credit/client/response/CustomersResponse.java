@@ -1,9 +1,6 @@
 package springboot.credit.client.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import springboot.credit.dto.CustomerDto;
 
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class CustomersResponse {
     private List<CustomerDto> customers;
 }

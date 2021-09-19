@@ -2,16 +2,16 @@
 -- GRANT ALL PRIVILEGES ON creditdb.* TO 'user'@'localhost';
 GRANT ALL PRIVILEGES ON *.* TO 'user'@'%';
 
-CREATE SCHEMA `creditdb` ;
+CREATE SCHEMA if not exists `creditdb` ;
 use creditdb;
 -- drop table if exists  credit;
 create table if not exists credit (
 id int NOT NULL AUTO_INCREMENT,
 credit_name varchar(100),
-primary key (id)
+primary key (ID)
 );
 
-CREATE SCHEMA `productdb` ;
+CREATE SCHEMA if not exists `productdb` ;
 use productdb;
 -- drop table if exists  product;
 create table if not exists  product (
@@ -23,7 +23,7 @@ primary key (id)
 -- foreign key (credit_id) references creditdb.credit(id)
 );
 
-CREATE SCHEMA `customerdb` ;
+CREATE SCHEMA if not exists `customerdb` ;
 use customerdb;
 -- drop table if exists  customer; 
 create table if not exists customer (

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.client.MockRestServiceServer;
+import springboot.credit.client.request.CreditNumbersRequest;
 import springboot.credit.client.response.ProductsResponse;
 import springboot.credit.dto.ProductDto;
 
@@ -51,7 +52,7 @@ class ProductClientTest {
                 .build();
         String customersDtoJson = objectMapper.writeValueAsString(productDto);
 
-        server.expect(requestTo("/"))
+        server.expect(requestTo("http://localhost:8082/"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(customersDtoJson))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -66,6 +67,10 @@ class ProductClientTest {
     void getProducts() throws Exception {
         //given
         List<Integer> creditIdList = List.of(4);
+        CreditNumbersRequest creditNumbersRequest = CreditNumbersRequest.builder()
+                .creditIds(creditIdList)
+                .build();
+        String creditNumbersRequestJson = objectMapper.writeValueAsString(creditNumbersRequest);
 
         ProductDto productDto = ProductDto.builder()
                 .creditId(4)
@@ -79,8 +84,10 @@ class ProductClientTest {
 
         String productsResponseJson = objectMapper.writeValueAsString(productsResponse);
 
-        server.expect(requestTo("/"))
+        server.expect(requestTo("http://localhost:8082/"))
                 .andExpect(method(HttpMethod.GET))
+                .andExpect(content().json(creditNumbersRequestJson))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(productsResponseJson));

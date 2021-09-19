@@ -11,8 +11,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreditsResponse {
-    private List<CreditResponse> credits;
+public class CreditAllInfoListResponse {
+    private List<CreditAllInfoResponse> credits;
 }
 
 

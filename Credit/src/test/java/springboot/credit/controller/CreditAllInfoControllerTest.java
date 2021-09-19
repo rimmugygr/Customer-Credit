@@ -14,23 +14,23 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import springboot.credit.controller.request.CreditRequest;
+import springboot.credit.controller.request.CreditAllInfoRequest;
 import springboot.credit.controller.response.CreditNumberResponse;
-import springboot.credit.controller.response.CreditResponse;
-import springboot.credit.controller.response.CreditsResponse;
+import springboot.credit.controller.response.CreditAllInfoResponse;
+import springboot.credit.controller.response.CreditAllInfoListResponse;
+import springboot.credit.dto.CreditAllInfoDto;
 import springboot.credit.dto.CreditDto;
-import springboot.credit.dto.CreditInfoDto;
 import springboot.credit.dto.CustomerDto;
 import springboot.credit.dto.ProductDto;
 import springboot.credit.mapper.CreditMapper;
-import springboot.credit.service.CreditService;
+import springboot.credit.service.CreditAllInfoService;
 
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class CreditControllerTest {
+class CreditAllInfoControllerTest {
 
     @Autowired
     MockMvc mvc;
@@ -39,7 +39,7 @@ class CreditControllerTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    CreditService mockService;
+    CreditAllInfoService mockService;
 
     @MockBean
     CreditMapper mockMapper;
@@ -47,10 +47,10 @@ class CreditControllerTest {
     @DisplayName("when data POST /")
     @Nested
     class PostCredit {
-        CreditRequest creditRequest;
+        CreditAllInfoRequest creditAllInfoRequest;
         String creditRequestJson;
 
-        CreditDto creditDto;
+        CreditAllInfoDto creditAllInfoDto;
 
         Integer creditNumber;
         CreditNumberResponse creditNumberResponse;
@@ -59,13 +59,13 @@ class CreditControllerTest {
         @BeforeEach
         void setUp() throws Exception {
             //given
-            creditRequest = CreditRequest.builder()
-                    .credit(new CreditRequest.CreditInfo("name_credit"))
-                    .customer(new CreditRequest.Customer("aa","ss","234"))
-                    .product(new CreditRequest.Product("name",100))
+            creditAllInfoRequest = CreditAllInfoRequest.builder()
+                    .credit(new CreditAllInfoRequest.CreditInfo("name_credit"))
+                    .customer(new CreditAllInfoRequest.Customer("aa","ss","234"))
+                    .product(new CreditAllInfoRequest.Product("name",100))
                     .build();
-            creditDto = CreditDto.builder()
-                    .credit(new CreditInfoDto(null,"name_credit"))
+            creditAllInfoDto = CreditAllInfoDto.builder()
+                    .credit(new CreditDto(null,"name_credit"))
                     .customer(new CustomerDto(null,"aa","ss","234"))
                     .product(new ProductDto(null,"name",100))
                     .build();
@@ -73,11 +73,11 @@ class CreditControllerTest {
             creditNumberResponse = CreditNumberResponse.builder()
                     .creditId(creditNumber)
                     .build();
-            creditRequestJson = objectMapper.writeValueAsString(creditRequest);
+            creditRequestJson = objectMapper.writeValueAsString(creditAllInfoRequest);
             creditNumberResponseJson = objectMapper.writeValueAsString(creditNumberResponse);
-            Mockito.when(mockMapper.map(creditRequest))
-                    .thenReturn(creditDto);
-            Mockito.when(mockService.createCredit(creditDto))
+            Mockito.when(mockMapper.map(creditAllInfoRequest))
+                    .thenReturn(creditAllInfoDto);
+            Mockito.when(mockService.createCredit(creditAllInfoDto))
                     .thenReturn(creditNumber);
         }
 
@@ -95,7 +95,7 @@ class CreditControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(creditRequestJson));
             //then
-            Mockito.verify(mockService).createCredit(creditDto);
+            Mockito.verify(mockService).createCredit(creditAllInfoDto);
         }
         @Test
         void shouldResponseCreateStatusWhenCreditIsCreated() throws Exception {
@@ -113,30 +113,30 @@ class CreditControllerTest {
     @DisplayName("when data GET /")
     @Nested
     class GetCredit {
-        CreditResponse creditResponse;
-        CreditsResponse creditsResponse;
+        CreditAllInfoResponse creditAllInfoResponse;
+        CreditAllInfoListResponse creditAllInfoListResponse;
         String creditsResponseJson;
-        CreditDto creditDto;
+        CreditAllInfoDto creditAllInfoDto;
 
         @BeforeEach
         void setUp() throws Exception {
             //given
-            creditResponse = CreditResponse.builder()
-                    .credit(new CreditResponse.CreditInfo("name_credit"))
-                    .customer(new CreditResponse.Customer("aa","ss","234"))
-                    .product(new CreditResponse.Product("name",100))
+            creditAllInfoResponse = CreditAllInfoResponse.builder()
+                    .credit(new CreditAllInfoResponse.CreditInfo("name_credit"))
+                    .customer(new CreditAllInfoResponse.Customer("aa","ss","234"))
+                    .product(new CreditAllInfoResponse.Product("name",100))
                     .build();
-            creditDto = CreditDto.builder()
-                    .credit(new CreditInfoDto(null,"name_credit"))
+            creditAllInfoDto = CreditAllInfoDto.builder()
+                    .credit(new CreditDto(null,"name_credit"))
                     .customer(new CustomerDto(null,"aa","ss","234"))
                     .product(new ProductDto(null,"name",100))
                     .build();
-            creditsResponse = CreditsResponse.builder()
-                    .credits(List.of(creditResponse))
+            creditAllInfoListResponse = CreditAllInfoListResponse.builder()
+                    .credits(List.of(creditAllInfoResponse))
                     .build();
-            creditsResponseJson = objectMapper.writeValueAsString(creditResponse);
-            Mockito.when(mockMapper.map(creditDto))
-                    .thenReturn(creditResponse);
+            creditsResponseJson = objectMapper.writeValueAsString(creditAllInfoResponse);
+            Mockito.when(mockMapper.map(creditAllInfoDto))
+                    .thenReturn(creditAllInfoResponse);
         }
 
         @AfterEach

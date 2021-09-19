@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreditResponse {
+public class CreditAllInfoResponse {
     private CreditInfo credit;
     private Product product;
     private Customer customer;
