@@ -30,7 +30,7 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/customerdb?serverTimezone=UTC");
+        dataSource.setUrl("jdbc:mysql://mysql:3306/customerdb?serverTimezone=UTC&autoReconnect=true&useSSL=false");
         dataSource.setUsername("user");
 //        dataSource.setPassword("1234qwer!@#$QWER");
         dataSource.setPassword("user");

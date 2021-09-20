@@ -12,11 +12,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductClient {
-    private final String PRODUCT_URL = "http://localhost:8082/";
+    private final String PRODUCT_URL = "http://product:8082/product/";
     private final RestTemplate restTemplate;
 
     public void createProduct(ProductDto product) {
-        restTemplate.postForLocation(PRODUCT_URL,product);
+        restTemplate.postForLocation(PRODUCT_URL, product);
     }
 
     public List<ProductDto> getProducts(List<Integer> creditsNumber) {

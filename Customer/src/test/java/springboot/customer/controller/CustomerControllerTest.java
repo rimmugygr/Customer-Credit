@@ -5,16 +5,17 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import springboot.customer.controller.request.CreditNumbersRequest;
 import springboot.customer.controller.response.CustomerResponse;
 import springboot.customer.controller.response.CustomersResponse;
 import springboot.customer.dto.CustomerDto;
@@ -27,7 +28,10 @@ import java.util.List;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@DataJdbcTest
+@ActiveProfiles("test")
 class CustomerControllerTest {
+    private final String URL_BASE = "/customer/";
 
     @Autowired
     MockMvc mvc;
@@ -41,9 +45,10 @@ class CustomerControllerTest {
     @MockBean
     CustomerMapper mockMapper;
 
-    @DisplayName("when data POST /")
+    @DisplayName("when data POST /customer/")
     @Nested
     class PostCustomer {
+        String url = URL_BASE;
         CustomerDto customerDto;
         Customer customer;
         String customerDtoRequestJson;
@@ -78,7 +83,7 @@ class CustomerControllerTest {
         void shouldCreateCustomerWhenProvideCustomer() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.post("/")
+                    MockMvcRequestBuilders.post(url)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(customerDtoRequestJson));
             //then
@@ -88,7 +93,7 @@ class CustomerControllerTest {
         void shouldResponseCreateStatusWhenCustomerIsCreated() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.post("/")
+                    MockMvcRequestBuilders.post(url)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(customerDtoRequestJson));
             //then
@@ -96,12 +101,11 @@ class CustomerControllerTest {
         }
     }
 
-    @DisplayName("when data GET /")
+    @DisplayName("when data GET /customer/")
     @Nested
     class GetCustomer {
-        CreditNumbersRequest creditNumbersRequest;
         List<Integer> creditNumberList;
-        String creditNumbersRequestJson;
+        String url;
         Customer customer;
         List<Customer> productList;
         CustomersResponse customersResponse;
@@ -112,9 +116,7 @@ class CustomerControllerTest {
         void setUp() throws Exception {
             //given
             creditNumberList = List.of(2);
-            creditNumbersRequest = CreditNumbersRequest.builder()
-                    .creditIds(creditNumberList)
-                    .build();
+            url = URL_BASE + "/?ids=2";
             customer = Customer.builder()
                     .creditId(2)
                     .firstName("name")
@@ -131,7 +133,6 @@ class CustomerControllerTest {
             customersResponse = CustomersResponse.builder()
                     .customers(List.of(customerResponse))
                     .build();
-            creditNumbersRequestJson = objectMapper.writeValueAsString(creditNumbersRequest);
             customersResponseJson = objectMapper.writeValueAsString(customersResponse);
             Mockito.when(mockService.getCustomersByCreditIds(creditNumberList))
                     .thenReturn(productList);
@@ -149,9 +150,7 @@ class CustomerControllerTest {
         void shouldGetCustomersWhenProvideListOfCreditsId() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(creditNumbersRequestJson));
+                    MockMvcRequestBuilders.get(url));
             //then
             Mockito.verify(mockService).getCustomersByCreditIds(creditNumberList);
         }
@@ -159,9 +158,7 @@ class CustomerControllerTest {
         void shouldResponseListCustomersWhenCustomersIsFound() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(creditNumbersRequestJson));
+                    MockMvcRequestBuilders.get(url));
             //then
             result.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
             result.andExpect(MockMvcResultMatchers.content().json(customersResponseJson));
@@ -170,9 +167,7 @@ class CustomerControllerTest {
         void shouldResponseStatusOkWhenCustomersIsFound() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(creditNumbersRequestJson));
+                    MockMvcRequestBuilders.get(url));
             //then
             result.andExpect(MockMvcResultMatchers.status().isOk());
         }

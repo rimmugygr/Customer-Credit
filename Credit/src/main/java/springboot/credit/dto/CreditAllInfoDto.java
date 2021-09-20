@@ -7,7 +7,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class CreditAllInfoDto {
     private CreditDto credit;
     private ProductDto product;

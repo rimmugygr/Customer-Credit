@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/", produces = "application/json")
+@RequestMapping(value = "/credit/", produces = "application/json")
 public class CreditAllInfoController {
     private final CreditAllInfoService creditAllInfoService;
     private final CreditMapper creditMapper;

@@ -18,6 +18,7 @@ public class CustomerService {
     }
 
     public void createCustomer(Customer customer) {
+        System.out.println(customer);
         customerRepository.save(customer);
     }
 }

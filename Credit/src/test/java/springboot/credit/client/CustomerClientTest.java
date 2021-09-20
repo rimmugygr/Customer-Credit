@@ -6,14 +6,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.client.MockRestServiceServer;
-import springboot.credit.client.request.CreditNumbersRequest;
 import springboot.credit.client.response.CustomersResponse;
 import springboot.credit.dto.CustomerDto;
 
@@ -26,7 +27,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @ExtendWith(SpringExtension.class)
 @RestClientTest(CustomerClient.class)
 @AutoConfigureWebClient(registerRestTemplate = true)
+@DataJdbcTest
+@ActiveProfiles("test")
 class CustomerClientTest {
+    private final String CUSTOMER_URL = "http://customer:8081/customer/";
 
     @Autowired
     private CustomerClient customerClient;
@@ -45,6 +49,7 @@ class CustomerClientTest {
     @Test
     void createCustomer() throws Exception {
         //given
+        String url = CUSTOMER_URL;
         CustomerDto customerDto = CustomerDto.builder()
                 .creditId(4)
                 .surname("matejko")
@@ -53,7 +58,7 @@ class CustomerClientTest {
                 .build();
         String customersDtoJson = objectMapper.writeValueAsString(customerDto);
 
-        server.expect(requestTo("http://localhost:8081/"))
+        server.expect(requestTo(url))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(customersDtoJson))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -68,10 +73,7 @@ class CustomerClientTest {
     void getCustomers() throws Exception {
         //given
         List<Integer> creditIdList = List.of(4);
-        CreditNumbersRequest creditNumbersRequest = CreditNumbersRequest.builder()
-                .creditIds(creditIdList)
-                .build();
-        String creditNumbersRequestJson = objectMapper.writeValueAsString(creditNumbersRequest);
+        String url = CUSTOMER_URL + "?ids=4";
 
         CustomerDto customerDto = CustomerDto.builder()
                 .creditId(4)
@@ -86,10 +88,8 @@ class CustomerClientTest {
 
         String customersResponseJson = objectMapper.writeValueAsString(customersResponse);
 
-        server.expect(requestTo("http://localhost:8081/"))
+        server.expect(requestTo(url))
                 .andExpect(method(HttpMethod.GET))
-                .andExpect(content().json(creditNumbersRequestJson))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(customersResponseJson));

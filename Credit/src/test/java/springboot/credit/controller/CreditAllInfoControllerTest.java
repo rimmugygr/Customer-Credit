@@ -5,10 +5,12 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,7 +32,10 @@ import java.util.List;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@DataJdbcTest
+@ActiveProfiles("test")
 class CreditAllInfoControllerTest {
+    private final String URL_BASE = "/credit/";
 
     @Autowired
     MockMvc mvc;
@@ -44,7 +49,7 @@ class CreditAllInfoControllerTest {
     @MockBean
     CreditMapper mockMapper;
 
-    @DisplayName("when data POST /")
+    @DisplayName("when data POST /credit/")
     @Nested
     class PostCredit {
         CreditAllInfoRequest creditAllInfoRequest;
@@ -91,7 +96,7 @@ class CreditAllInfoControllerTest {
         void shouldCreateCreditWhenProvidedNewCredit() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.post("/")
+                    MockMvcRequestBuilders.post(URL_BASE)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(creditRequestJson));
             //then
@@ -101,7 +106,7 @@ class CreditAllInfoControllerTest {
         void shouldResponseCreateStatusWhenCreditIsCreated() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.post("/")
+                    MockMvcRequestBuilders.post(URL_BASE)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(creditRequestJson));
             //then
@@ -110,7 +115,7 @@ class CreditAllInfoControllerTest {
     }
 
 
-    @DisplayName("when data GET /")
+    @DisplayName("when data GET /credit/")
     @Nested
     class GetCredit {
         CreditAllInfoResponse creditAllInfoResponse;
@@ -149,7 +154,7 @@ class CreditAllInfoControllerTest {
         void shouldGetAllCreditsWhenGet() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/"));
+                    MockMvcRequestBuilders.get(URL_BASE));
             //then
             Mockito.verify(mockService).getAllCredits();
         }
@@ -157,7 +162,7 @@ class CreditAllInfoControllerTest {
         void shouldResponseStatusOkWhenCreditsAreFound() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/"));
+                    MockMvcRequestBuilders.get(URL_BASE));
             //then
             result.andExpect(MockMvcResultMatchers.status().isOk());
         }

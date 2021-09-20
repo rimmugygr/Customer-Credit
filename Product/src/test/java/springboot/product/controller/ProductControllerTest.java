@@ -5,16 +5,17 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import springboot.product.controller.request.CreditNumbersRequest;
 import springboot.product.controller.request.ProductRequest;
 import springboot.product.controller.response.ProductResponse;
 import springboot.product.controller.response.ProductsResponse;
@@ -28,7 +29,10 @@ import java.util.List;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@DataJdbcTest
+@ActiveProfiles("test")
 class ProductControllerTest {
+    private final String URL_BASE = "/product/";
 
     @Autowired
     MockMvc mvc;
@@ -43,15 +47,17 @@ class ProductControllerTest {
     ProductMapper mockMapper;
 
 
-    @DisplayName("when data POST /")
+    @DisplayName("when data POST /product/")
     @Nested
     class PostProduct {
+        String url;
         ProductRequest productRequest;
         ProductDto productDto;
         String productRequestJson;
         @BeforeEach
         void setUp() throws Exception {
             //given
+            url = URL_BASE;
             productRequest = ProductRequest.builder()
                     .productName("name")
                     .value(123)
@@ -77,7 +83,7 @@ class ProductControllerTest {
         void shouldCreateProductWhenProvideProduct() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.post("/")
+                    MockMvcRequestBuilders.post(url)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(productRequestJson));
             //then
@@ -87,7 +93,7 @@ class ProductControllerTest {
         void shouldResponseCreateStatusWhenProductIsCreated() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.post("/")
+                    MockMvcRequestBuilders.post(url)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(productRequestJson));
             //then
@@ -95,24 +101,22 @@ class ProductControllerTest {
         }
     }
 
-    @DisplayName("when data GET /")
+    @DisplayName("when data GET /product/")
     @Nested
     class GetProduct {
-        CreditNumbersRequest creditNumbersRequest;
+        String url;
         List<Integer> creditNumberList;
-        String creditNumbersRequestJson;
         Product product;
         List<Product> productList;
         ProductResponse productResponse;
         ProductsResponse productsResponse;
         String productsResponseJson;
+
         @BeforeEach
         void setUp() throws Exception {
             //given
             creditNumberList = List.of(1);
-            creditNumbersRequest = CreditNumbersRequest.builder()
-                    .creditIds(creditNumberList)
-                    .build();
+            url = URL_BASE + "?ids=1";
             product = Product.builder()
                     .id(1)
                     .creditId(1)
@@ -128,8 +132,8 @@ class ProductControllerTest {
             productsResponse = ProductsResponse.builder()
                     .products(List.of(productResponse))
                     .build();
-            creditNumbersRequestJson = objectMapper.writeValueAsString(creditNumbersRequest);
             productsResponseJson = objectMapper.writeValueAsString(productsResponse);
+
             Mockito.when(mockService.getProducts(creditNumberList))
                     .thenReturn(productList);
             Mockito.when(mockMapper.mapToResponse(product))
@@ -146,9 +150,7 @@ class ProductControllerTest {
         void shouldGetProductsWhenProvideListOfCreditsId() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(creditNumbersRequestJson));
+                    MockMvcRequestBuilders.get(url));
             //then
             Mockito.verify(mockService).getProducts(creditNumberList);
         }
@@ -156,9 +158,7 @@ class ProductControllerTest {
         void shouldResponseListProductsWhenProductsIsFinds() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(creditNumbersRequestJson));
+                    MockMvcRequestBuilders.get(url));
             //then
             result.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
             result.andExpect(MockMvcResultMatchers.content().json(productsResponseJson));
@@ -167,9 +167,7 @@ class ProductControllerTest {
         void shouldResponseOkStatusWhenProductsIsFinds() throws Exception {
             //when
             ResultActions result = mvc.perform(
-                    MockMvcRequestBuilders.get("/")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(creditNumbersRequestJson));
+                    MockMvcRequestBuilders.get(url));
             //then
             result.andExpect(MockMvcResultMatchers.status().isOk());
         }

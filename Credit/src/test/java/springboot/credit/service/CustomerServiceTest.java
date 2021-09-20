@@ -6,8 +6,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import springboot.credit.client.CustomerClient;
 import springboot.credit.dto.CustomerDto;
@@ -16,6 +18,8 @@ import java.util.List;
 
 @Import(CustomerService.class)
 @ExtendWith(SpringExtension.class)
+@DataJdbcTest
+@ActiveProfiles("test")
 class CustomerServiceTest {
     @Autowired
     CustomerService customerService;
