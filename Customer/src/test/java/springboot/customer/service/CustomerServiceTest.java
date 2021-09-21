@@ -12,11 +12,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import springboot.customer.dto.CustomerDto;
+import springboot.customer.exceptions.ResourceNotFound;
+import springboot.customer.exceptions.ResourceUnprocessable;
 import springboot.customer.mapper.CustomerMapper;
 import springboot.customer.model.Customer;
 import springboot.customer.repository.CustomerRepository;
 
+import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Import(CustomerService.class)
 @ExtendWith(SpringExtension.class)
@@ -24,7 +29,7 @@ import java.util.List;
 @ActiveProfiles("test")
 class CustomerServiceTest {
     @Autowired
-    CustomerService productService;
+    CustomerService customerService;
 
     @MockBean
     CustomerRepository mockRepository;
@@ -35,14 +40,16 @@ class CustomerServiceTest {
     @DisplayName("getCustomersByCreditIds")
     @Nested
     class GetCustomer {
-        List<Integer> creditNumberList;
+        List<Integer> creditNumberList, creditNumberListNotFund;
         Customer product1;
         Customer product2;
-        List<Customer> productList;
+        List<Customer> productList, productListNotFound;
 
         @BeforeEach
         void setUp() throws Exception {
             //given
+
+            // case found customers
             creditNumberList = List.of(1,2);
             product1 = Customer.builder()
                     .creditId(2)
@@ -61,6 +68,10 @@ class CustomerServiceTest {
             productList = List.of(product1, product2);
             Mockito.when(mockRepository.findAllByCreditIdIn(creditNumberList))
                     .thenReturn(productList);
+
+            // case not found customers
+            creditNumberListNotFund = List.of(5, 6);
+            productListNotFound = Collections.emptyList();
         }
 
         @AfterEach
@@ -72,7 +83,7 @@ class CustomerServiceTest {
         @Test
         void shouldGetListProductWhenProvideListOfId() {
             //when
-            List<Customer> products = productService.getCustomersByCreditIds(creditNumberList);
+            List<Customer> products = customerService.getCustomersByCreditIds(creditNumberList);
             //then
             MatcherAssert.assertThat(products, Matchers.notNullValue());
             MatcherAssert.assertThat(products, Matchers.contains(product1, product2));
@@ -81,21 +92,32 @@ class CustomerServiceTest {
         @Test
         void shouldInvokeRepositoryForProductsWhenProvideListOfId() {
             //when
-            productService.getCustomersByCreditIds(creditNumberList);
+            customerService.getCustomersByCreditIds(creditNumberList);
             //then
             Mockito.verify(mockRepository).findAllByCreditIdIn(creditNumberList);
+        }
+
+        @Test
+        void shouldThrowExceptionWhenProvidedCreditIdsNotFund() {
+            //when
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                    customerService.getCustomersByCreditIds(creditNumberListNotFund));
+            //then
+            MatcherAssert.assertThat(exception, Matchers.instanceOf(ResourceNotFound.class));
         }
     }
 
     @DisplayName("createCustomer")
     @Nested
     class CreateCustomer {
-        CustomerDto anyCustomerDto;
-        Customer anyCustomer;
+        CustomerDto anyCustomerDto , customerDtoInvalid;
+        Customer anyCustomer, customerInvalid;
 
         @BeforeEach
         void setUp() throws Exception {
             //given
+
+            // case with validate data
             anyCustomerDto = CustomerDto.builder()
                     .creditId(2)
                     .firstName("asdasd")
@@ -110,6 +132,16 @@ class CustomerServiceTest {
                     .build();
             Mockito.when(mockMapper.map(anyCustomerDto))
                     .thenReturn(anyCustomer);
+
+            // case with invalidate data
+            customerDtoInvalid = CustomerDto.builder()
+                    .firstName("")
+                    .surname("")
+                    .build();
+            customerInvalid = Customer.builder()
+                    .firstName("")
+                    .surname("")
+                    .build();
         }
 
         @AfterEach
@@ -121,9 +153,18 @@ class CustomerServiceTest {
         @Test
         void shouldCreateCustomerWhenProvidedAnyCustomer() {
             //when
-            productService.createCustomer(anyCustomer);
+            customerService.createCustomer(anyCustomerDto);
             //then
             Mockito.verify(mockRepository).save(anyCustomer);
+        }
+
+        @Test
+        void shouldThrowExceptionWhenProvidedInvalidCustomer() {
+            //when
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                customerService.createCustomer(customerDtoInvalid));
+            //then
+            MatcherAssert.assertThat(exception, Matchers.instanceOf(ResourceUnprocessable.class));
         }
     }
 

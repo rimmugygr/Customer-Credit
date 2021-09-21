@@ -12,10 +12,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import springboot.product.dto.ProductDto;
+import springboot.product.exceptions.ResourceNotFound;
+import springboot.product.exceptions.ResourceUnprocessable;
 import springboot.product.mapper.ProductMapper;
 import springboot.product.model.Product;
 import springboot.product.repository.ProductRepository;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,14 +40,16 @@ class ProductServiceTest {
     @DisplayName("getProductsByCreditIds")
     @Nested
     class GetProduct {
-        List<Integer> creditNumberList;
+        List<Integer> creditNumberList, creditNumberListNotFund;
         Product product1;
         Product product2;
-        List<Product> productList;
+        List<Product> productList, customerListNotFound ;
 
         @BeforeEach
         void setUp() throws Exception {
             //given
+
+            // case when found customers
             creditNumberList = List.of(1,2);
             product1 = Product.builder()
                     .id(2)
@@ -61,6 +66,10 @@ class ProductServiceTest {
             productList = List.of(product1, product2);
             Mockito.when(mockRepository.findAllByCreditIdIn(creditNumberList))
                     .thenReturn(productList);
+
+            // case not found customers
+            creditNumberListNotFund = List.of(5, 6);
+            customerListNotFound = Collections.emptyList();
         }
 
         @AfterEach
@@ -72,7 +81,7 @@ class ProductServiceTest {
         @Test
         void shouldGetListProductWhenProvideListOfId() {
             //when
-            List<Product> products = productService.getProducts(creditNumberList);
+            List<Product> products = productService.getProductsByCreditIds(creditNumberList);
             //then
             MatcherAssert.assertThat(products, Matchers.notNullValue());
             MatcherAssert.assertThat(products, Matchers.contains(product1, product2));
@@ -81,35 +90,56 @@ class ProductServiceTest {
         @Test
         void shouldInvokeRepositoryForProductsWhenProvideListOfId() {
             //when
-            productService.getProducts(creditNumberList);
+            productService.getProductsByCreditIds(creditNumberList);
             //then
             Mockito.verify(mockRepository).findAllByCreditIdIn(creditNumberList);
+        }
+
+        @Test
+        void shouldThrowExceptionWhenProvidedCreditIdsNotFund() {
+            //when
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                    productService.getProductsByCreditIds(creditNumberListNotFund));
+            //then
+            MatcherAssert.assertThat(exception, Matchers.instanceOf(ResourceNotFound.class));
         }
     }
 
     @DisplayName("createProduct")
     @Nested
     class CreateProduct {
-        ProductDto productDto;
-        Product product;
+        ProductDto productDto, productDtoInvalid;
+        Product product, productInvalid;
 
         @BeforeEach
         void setUp() throws Exception {
             //given
+
+            // case with validate data
             product = Product.builder()
-                    .id(2)
                     .productName("aaa")
                     .value(312)
                     .creditId(1)
                     .build();
             productDto = ProductDto.builder()
-                    .id(2)
                     .productName("aaa")
                     .value(312)
                     .creditId(1)
                     .build();
             Mockito.when(mockMapper.map(productDto))
                     .thenReturn(product);
+
+            // case with invalidate data
+            productDtoInvalid = ProductDto.builder()
+                    .productName("")
+                    .value(-10)
+                    .build();
+            productInvalid = Product.builder()
+                    .productName("")
+                    .value(-10)
+                    .build();
+            Mockito.when(mockMapper.map(productDtoInvalid))
+                    .thenReturn(productInvalid);
         }
 
         @AfterEach
@@ -124,6 +154,15 @@ class ProductServiceTest {
             productService.createProduct(productDto);
             //then
             Mockito.verify(mockRepository).save(product);
+        }
+
+        @Test
+        void shouldThrowExceptionWhenProvidedInvalidProduct() {
+            //when
+            Exception exception = assertThrows(RuntimeException.class, () ->
+                    productService.createProduct(productDtoInvalid));
+            //then
+            MatcherAssert.assertThat(exception, Matchers.instanceOf(ResourceUnprocessable.class));
         }
     }
 

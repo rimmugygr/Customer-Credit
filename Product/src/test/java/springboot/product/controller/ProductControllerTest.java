@@ -5,12 +5,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -20,6 +18,8 @@ import springboot.product.controller.request.ProductRequest;
 import springboot.product.controller.response.ProductResponse;
 import springboot.product.controller.response.ProductsResponse;
 import springboot.product.dto.ProductDto;
+import springboot.product.exceptions.ResourceNotFound;
+import springboot.product.exceptions.ResourceUnprocessable;
 import springboot.product.mapper.ProductMapper;
 import springboot.product.model.Product;
 import springboot.product.service.ProductService;
@@ -27,10 +27,8 @@ import springboot.product.service.ProductService;
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@WebMvcTest
 @AutoConfigureMockMvc
-@DataJdbcTest
-@ActiveProfiles("test")
 class ProductControllerTest {
     private final String URL_BASE = "/product/";
 
@@ -51,13 +49,16 @@ class ProductControllerTest {
     @Nested
     class PostProduct {
         String url;
-        ProductRequest productRequest;
-        ProductDto productDto;
-        String productRequestJson;
+        ProductRequest productRequest, productRequestInvalid;
+        ProductDto productDto, productDtoInvalid;
+        String productRequestJson, productRequestInvalidJson;
+
         @BeforeEach
         void setUp() throws Exception {
             //given
             url = URL_BASE;
+
+            // any product case
             productRequest = ProductRequest.builder()
                     .productName("name")
                     .value(123)
@@ -71,6 +72,21 @@ class ProductControllerTest {
             productRequestJson = objectMapper.writeValueAsString(productRequest);
             Mockito.when(mockMapper.mapToDto(productRequest))
                     .thenReturn(productDto);
+
+            // invalid product case
+            productRequestInvalid = ProductRequest.builder()
+                    .productName("")
+                    .value(null)
+                    .build();
+            productDtoInvalid = ProductDto.builder()
+                    .productName("")
+                    .value(null)
+                    .build();
+            productRequestInvalidJson = objectMapper.writeValueAsString(productRequestInvalid);
+            Mockito.when(mockMapper.mapToDto(productRequestInvalid))
+                    .thenReturn(productDtoInvalid);
+            Mockito.doThrow(ResourceUnprocessable.class)
+                    .when(mockService).createProduct(productDtoInvalid);
         }
 
         @AfterEach
@@ -99,13 +115,23 @@ class ProductControllerTest {
             //then
             result.andExpect(MockMvcResultMatchers.status().isCreated());
         }
+        @Test
+        void shouldResponseUnprocessableEntityStatusWhenProductHaveWrongData() throws Exception {
+            //when
+            ResultActions result = mvc.perform(
+                    MockMvcRequestBuilders.post(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(productRequestInvalidJson));
+            //then
+            result.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
+        }
     }
 
     @DisplayName("when data GET /product/")
     @Nested
     class GetProduct {
-        String url;
-        List<Integer> creditNumberList;
+        String url, urlNotFound;
+        List<Integer> creditNumberList, creditNumberListNotFound;
         Product product;
         List<Product> productList;
         ProductResponse productResponse;
@@ -115,6 +141,8 @@ class ProductControllerTest {
         @BeforeEach
         void setUp() throws Exception {
             //given
+
+            // case with resource found
             creditNumberList = List.of(1);
             url = URL_BASE + "?ids=1";
             product = Product.builder()
@@ -133,11 +161,16 @@ class ProductControllerTest {
                     .products(List.of(productResponse))
                     .build();
             productsResponseJson = objectMapper.writeValueAsString(productsResponse);
-
-            Mockito.when(mockService.getProducts(creditNumberList))
+            Mockito.when(mockService.getProductsByCreditIds(creditNumberList))
                     .thenReturn(productList);
             Mockito.when(mockMapper.mapToResponse(product))
                     .thenReturn(productResponse);
+
+            // case with resource not found
+            urlNotFound = URL_BASE + "?ids=3";
+            creditNumberListNotFound = List.of(3);
+            Mockito.doThrow(ResourceNotFound.class)
+                    .when(mockService).getProductsByCreditIds(creditNumberListNotFound);
         }
 
         @AfterEach
@@ -152,7 +185,7 @@ class ProductControllerTest {
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.get(url));
             //then
-            Mockito.verify(mockService).getProducts(creditNumberList);
+            Mockito.verify(mockService).getProductsByCreditIds(creditNumberList);
         }
         @Test
         void shouldResponseListProductsWhenProductsIsFinds() throws Exception {
@@ -170,6 +203,14 @@ class ProductControllerTest {
                     MockMvcRequestBuilders.get(url));
             //then
             result.andExpect(MockMvcResultMatchers.status().isOk());
+        }
+        @Test
+        void shouldResponseNotFoundStatusWhenProductNotFoundByIds() throws Exception {
+            //when
+            ResultActions result = mvc.perform(
+                    MockMvcRequestBuilders.get(urlNotFound));
+            //then
+            result.andExpect(MockMvcResultMatchers.status().isNotFound());
         }
     }
 

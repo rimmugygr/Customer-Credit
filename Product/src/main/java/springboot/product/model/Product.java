@@ -18,5 +18,5 @@ public class Product {
     private String productName;
     @Column("PRODUCT_VALUE")
     private Integer value;
-    private int creditId;
+    private Integer creditId;
 }

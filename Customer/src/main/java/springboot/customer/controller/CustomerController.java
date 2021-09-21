@@ -3,6 +3,7 @@ package springboot.customer.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import springboot.customer.controller.request.CustomerRequest;
 import springboot.customer.controller.response.CustomerResponse;
 import springboot.customer.controller.response.CustomersResponse;
 import springboot.customer.dto.CustomerDto;
@@ -36,10 +37,8 @@ public class CustomerController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCustomer(@RequestBody CustomerDto customerDto) {
-        System.out.println(customerDto);
-        Customer customer = customerMapper.map(customerDto);
-        System.out.println(customer);
-        customerService.createCustomer(customer);
+    public void createCustomer(@RequestBody CustomerRequest customerRequest) {
+        System.out.println(customerRequest);
+        customerService.createCustomer(customerMapper.mapToDto(customerRequest));
     }
 }

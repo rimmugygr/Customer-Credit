@@ -26,7 +26,7 @@ public class ProductController {
         System.out.println(creditNumbers);
 
         List<ProductResponse> productsResponseList = productService
-                .getProducts(creditNumbers)
+                .getProductsByCreditIds(creditNumbers)
                 .stream()
                 .map(productMapper::mapToResponse)
                 .collect(Collectors.toList());
@@ -40,7 +40,6 @@ public class ProductController {
     public void createProduct(@RequestBody ProductRequest productRequest) {
         System.out.println(productRequest);
         ProductDto productDto = productMapper.mapToDto(productRequest);
-        System.out.println(productDto);
         productService.createProduct(productDto);
     }
 }
