@@ -31,47 +31,47 @@ services:
     ports:
       - 8090:80
       
-  credit:
-    build: ./credit
-    #network_mode: host
-    container_name: credit
-    networks:
-      - db-network
-    depends_on:
-      - mysql
-    # links:
-      # - phpmyadmin
-    restart: on-failure
-    ports:
-      - 8080:8080
+  # credit:
+    # build: ./credit
+    # #network_mode: host
+    # container_name: credit
+    # networks:
+      # - db-network
+    # depends_on:
+      # - mysql
+    # # links:
+      # # - phpmyadmin
+    # restart: on-failure
+    # ports:
+      # - 8080:8080
 
-  product:
-    build: ./product
-    #network_mode: host
-    container_name: product
-    networks:
-      - db-network
-    depends_on:
-      - mysql
-    # links:
-      # - credit
-    restart: on-failure
-    ports:
-      - 8082:8082
+  # product:
+    # build: ./product
+    # #network_mode: host
+    # container_name: product
+    # networks:
+      # - db-network
+    # depends_on:
+      # - mysql
+    # # links:
+      # # - credit
+    # restart: on-failure
+    # ports:
+      # - 8082:8082
       
-  customer:
-    build: ./customer
-    #network_mode: host
-    container_name: customer
-    networks:
-      - db-network
-    depends_on:
-      - mysql
-    # links:
-      # - credit
-    restart: on-failure
-    ports:
-      - 8081:8081
+  # customer:
+    # build: ./customer
+    # #network_mode: host
+    # container_name: customer
+    # networks:
+      # - db-network
+    # depends_on:
+      # - mysql
+    # # links:
+      # # - credit
+    # restart: on-failure
+    # ports:
+      # - 8081:8081
 
 networks:
   db-network:
