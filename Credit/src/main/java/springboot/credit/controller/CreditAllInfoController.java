@@ -1,7 +1,8 @@
 package springboot.credit.controller;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,8 @@ public class CreditAllInfoController {
     private final CreditAllInfoService creditAllInfoService;
     private final CreditMapper creditMapper;
 
+    @ApiOperation(value = "Add new credit", httpMethod = "POST")
+    @ApiResponse(code = 201, message = "Add credit succeeded")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreditNumberResponse createCredit(@RequestBody CreditAllInfoRequest credit) {
@@ -33,6 +36,8 @@ public class CreditAllInfoController {
                 .build();
     }
 
+    @ApiOperation(value = "Returns all credits", httpMethod = "GET")
+    @ApiResponse(code = 200, message = "Get all credits succeeded")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public CreditAllInfoListResponse getCredits() {
