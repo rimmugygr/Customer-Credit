@@ -14,8 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductClient {
-    private final String PRODUCT_URL = "http://localhost:8082/product/";
-//    private final String PRODUCT_URL = "http://product:8082/product/";
+    private final String PRODUCT_URL = "http://product:8082/product/";
     private final RestTemplate restTemplate;
 
     public void createProduct(ProductDto product) {

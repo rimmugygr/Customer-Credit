@@ -16,8 +16,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomerClient {
-//    private final String CUSTOMER_URL = "http://customer:8081/customer/";
-    private final String CUSTOMER_URL = "http://localhost:8081/customer/";
+    private final String CUSTOMER_URL = "http://customer:8081/customer/";
     private final RestTemplate restTemplate;
 
 

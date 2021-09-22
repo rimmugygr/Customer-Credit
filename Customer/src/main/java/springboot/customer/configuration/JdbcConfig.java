@@ -30,26 +30,9 @@ public class JdbcConfig extends AbstractJdbcConfiguration {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-//        dataSource.setUrl("jdbc:mysql://mysql:3306/customerdb?serverTimezone=UTC&autoReconnect=true&useSSL=false");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/customerdb?serverTimezone=UTC&autoReconnect=true&useSSL=false");
+        dataSource.setUrl("jdbc:mysql://mysql:3306/customerdb?serverTimezone=UTC&autoReconnect=true&useSSL=false");
         dataSource.setUsername("customer");
         dataSource.setPassword("customer");
         return dataSource;
     }
 }
-/*
-This application is for store customer credits which menage data of customer, product and credit.
-Application each customer, credit and product treat as new
-Date structure of consumer credit:
-		Credit
-			- creditName (string, not null, not empty)
-		Product
-			- productName (string, not null, not empty)
-			- value (integer, 0 or larger)
-		Customer
-			- firstName (string, not null, not empty)
-			- surname (string, not null, not empty)
-			- pesel (string, not null, not empty)
-
-*/
-
