@@ -8,6 +8,7 @@ Customer-Credit Application implemented with Spring Boot, Spring Data Jdbc on RE
 2. Spring Boot and listed Spring modules 
     - Spring Data Jdbc
 3. Lombok
+4. Swagger2 and Swagger-ui
 4. MySQL database
 
 ## Some information about it
@@ -26,7 +27,7 @@ Date structure of consumer credit:
 
 ## How to Run?
 ### Run using docker(preferred) by docker-compose
-Make sure docker is up and running on your local machine, and ports 8080, 8081, 8082, 3306  are free
+Make sure docker is up and running on your local machine, and ports 8080, 8081, 8082, 8090, 3306  are free
 
 1. Download the repo and execute the following commands in the same order
 2. Build the project
@@ -37,7 +38,21 @@ Make sure docker is up and running on your local machine, and ports 8080, 8081, 
     ```shell script
     docker-compose up --force-recreate
       ```   
-4. Beofre 
+
+## Documentation
+### Swagger
+```
+http://localhost:8080/api-docs
+```
+### Swagger-ui
+```
+http://localhost:8080/swagger-ui.html
+```
+### View database by phpMyAdmin
+```
+http://localhost:8090/
+```
+
 ## Sample use
 Sample use by postman application:
 1. Add new credit:
