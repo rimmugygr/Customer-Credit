@@ -12,17 +12,17 @@ Customer-Credit Application implemented with Spring Boot, Spring Data Jdbc on RE
 
 ## Some information about it
 This application is for store customer credits which menage data of customer, product and credit.
-Application each customer, credit and product treat as new
+Application each customer, credit and product treat as new.
 Date structure of consumer credit:
-		Credit
-			- creditName (string, not null, not empty)
-		Product
-			- productName (string, not null, not empty)
-			- value (integer, 0 or larger)
-		Customer
-			- firstName (string, not null, not empty)
-			- surname (string, not null, not empty)
-			- pesel (string, not null, not empty)
+		- Credit
+		  - creditName (string, not null, not empty)
+		- Product
+		  - productName (string, not null, not empty)
+		  - value (integer, 0 or larger)
+		- Customer
+		  - firstName (string, not null, not empty)
+		  - surname (string, not null, not empty)
+		  - pesel (string, not null, not empty)
 
 ## How to Run?
 ### Run using docker(preferred) by docker-compose
