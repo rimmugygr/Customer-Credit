@@ -1,7 +1,8 @@
 # Customer-Credit
 
 ## What's this?
-Customer-Credit Application implemented with Spring Boot, Spring Data Jdbc
+Customer-Credit Application implemented with Spring Boot, Spring Data Jdbc on REST api
+
 ## How to Run?
 ### Run using docker(preferred) by docker-compose
 Make sure docker is up and running on your local machine
@@ -20,3 +21,33 @@ Make sure docker is up and running on your local machine
 2. Spring Boot and listed Spring modules 
     - Spring Data Jdbc
 4. MySQL database
+
+## Sample use
+Add new credit:
+	GET
+    ```shell script
+    $ http://localhost:8080/credit/
+      ```   
+	with JSON body:
+	```shell script
+    $ {
+    "credit" : {
+        "creditName" : "Some credit name"
+    },
+    "product"  :  {
+        "productName" : "Some product name",
+        "value" : 123456
+    },
+    "customer" : {
+        "firstName" : "Jan",
+        "surname" : "Kowalski",
+        "pesel" : "1234567890"
+    }
+	}
+      ```   
+	should return id of this credit
+	```shell script
+    {
+    "creditId": 1234567
+	}
+      ```   
