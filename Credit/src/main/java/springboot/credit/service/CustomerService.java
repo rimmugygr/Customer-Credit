@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import springboot.credit.client.CustomerClient;
 import springboot.credit.dto.CustomerDto;
+import springboot.credit.exceptions.ResourceUnprocessable;
 
 import java.util.List;
 

@@ -5,12 +5,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -24,16 +22,16 @@ import springboot.credit.dto.CreditAllInfoDto;
 import springboot.credit.dto.CreditDto;
 import springboot.credit.dto.CustomerDto;
 import springboot.credit.dto.ProductDto;
+import springboot.credit.exceptions.ResourceIncorrectFormat;
+import springboot.credit.exceptions.ResourceUnprocessable;
 import springboot.credit.mapper.CreditMapper;
 import springboot.credit.service.CreditAllInfoService;
 
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@WebMvcTest
 @AutoConfigureMockMvc
-@DataJdbcTest
-@ActiveProfiles("test")
 class CreditAllInfoControllerTest {
     private final String URL_BASE = "/credit/";
 
@@ -52,10 +50,10 @@ class CreditAllInfoControllerTest {
     @DisplayName("when data POST /credit/")
     @Nested
     class PostCredit {
-        CreditAllInfoRequest creditAllInfoRequest;
-        String creditRequestJson;
+        CreditAllInfoRequest creditAllInfoRequest, creditAllInfoRequestWithNulls, creditAllInfoRequestInvalid;
+        String creditRequestJson, creditAllInfoRequestWithNullsJson, creditAllInfoRequestInvalidJson;
 
-        CreditAllInfoDto creditAllInfoDto;
+        CreditAllInfoDto creditAllInfoDto, creditAllInfoDtoWithNulls, creditAllInfoDtoInvalid;
 
         Integer creditNumber;
         CreditNumberResponse creditNumberResponse;
@@ -64,6 +62,8 @@ class CreditAllInfoControllerTest {
         @BeforeEach
         void setUp() throws Exception {
             //given
+
+            // any credit case
             creditAllInfoRequest = CreditAllInfoRequest.builder()
                     .credit(new CreditAllInfoRequest.CreditInfo("name_credit"))
                     .customer(new CreditAllInfoRequest.Customer("aa","ss","234"))
@@ -82,8 +82,36 @@ class CreditAllInfoControllerTest {
             creditNumberResponseJson = objectMapper.writeValueAsString(creditNumberResponse);
             Mockito.when(mockMapper.map(creditAllInfoRequest))
                     .thenReturn(creditAllInfoDto);
-            Mockito.when(mockService.createCredit(creditAllInfoDto))
+            Mockito.when(mockService.createCreditInfo(creditAllInfoDto))
                     .thenReturn(creditNumber);
+
+            // credit with null case
+            creditAllInfoRequestWithNulls = CreditAllInfoRequest.builder()
+                    .build();
+            creditAllInfoDtoWithNulls = CreditAllInfoDto.builder()
+                    .build();
+            creditAllInfoRequestWithNullsJson = objectMapper.writeValueAsString(creditAllInfoRequestWithNulls);
+            Mockito.when(mockMapper.map(creditAllInfoRequestWithNulls))
+                    .thenReturn(creditAllInfoDtoWithNulls);
+            Mockito.doThrow(ResourceIncorrectFormat.class)
+                    .when(mockService).createCreditInfo(creditAllInfoDtoWithNulls);
+
+            // credit invalid case
+            creditAllInfoRequestInvalid = CreditAllInfoRequest.builder()
+                    .credit(new CreditAllInfoRequest.CreditInfo())
+                    .customer(new CreditAllInfoRequest.Customer())
+                    .product(new CreditAllInfoRequest.Product())
+                    .build();
+            creditAllInfoDtoInvalid = CreditAllInfoDto.builder()
+                    .credit(new CreditDto())
+                    .customer(new CustomerDto())
+                    .product(new ProductDto())
+                    .build();
+            creditAllInfoRequestInvalidJson = objectMapper.writeValueAsString(creditAllInfoRequestInvalid);
+            Mockito.when(mockMapper.map(creditAllInfoRequestInvalid))
+                    .thenReturn(creditAllInfoDtoInvalid);
+            Mockito.doThrow(ResourceUnprocessable.class)
+                    .when(mockService).createCreditInfo(creditAllInfoDtoInvalid);
         }
 
         @AfterEach
@@ -100,7 +128,7 @@ class CreditAllInfoControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(creditRequestJson));
             //then
-            Mockito.verify(mockService).createCredit(creditAllInfoDto);
+            Mockito.verify(mockService).createCreditInfo(creditAllInfoDto);
         }
         @Test
         void shouldResponseCreateStatusWhenCreditIsCreated() throws Exception {
@@ -111,6 +139,26 @@ class CreditAllInfoControllerTest {
                             .content(creditRequestJson));
             //then
             result.andExpect(MockMvcResultMatchers.status().isCreated());
+        }
+        @Test
+        void shouldResponseUnprocessableEntityStatusWhenCreditHaveWrongData() throws Exception {
+            //when
+            ResultActions result = mvc.perform(
+                    MockMvcRequestBuilders.post(URL_BASE)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(creditAllInfoRequestInvalidJson));
+            //then
+            result.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
+        }
+        @Test
+        void shouldResponseBadRequestStatusWhenCreditWrongFormat() throws Exception {
+            //when
+            ResultActions result = mvc.perform(
+                    MockMvcRequestBuilders.post(URL_BASE)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(creditAllInfoRequestWithNullsJson));
+            //then
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest());
         }
     }
 
@@ -156,7 +204,7 @@ class CreditAllInfoControllerTest {
             ResultActions result = mvc.perform(
                     MockMvcRequestBuilders.get(URL_BASE));
             //then
-            Mockito.verify(mockService).getAllCredits();
+            Mockito.verify(mockService).getAllCreditsInfo();
         }
         @Test
         void shouldResponseStatusOkWhenCreditsAreFound() throws Exception {

@@ -15,6 +15,7 @@ public class CreditMapper {
     private final ProductMapper productMapper;
 
     public CreditAllInfoDto map(CreditAllInfoRequest creditAllInfoRequest) {
+        if(creditAllInfoRequest == null) return null;
         return CreditAllInfoDto.builder()
                 .product(productMapper.mapToDto(creditAllInfoRequest.getProduct()))
                 .credit(creditInfoMapper.mapToDto(creditAllInfoRequest.getCredit()))
@@ -22,6 +23,7 @@ public class CreditMapper {
                 .build();
     }
     public CreditAllInfoResponse map(CreditAllInfoDto creditAllInfoDto) {
+        if(creditAllInfoDto == null) return null;
         return CreditAllInfoResponse.builder()
                 .credit(creditInfoMapper.mapToResponse(creditAllInfoDto.getCredit()))
                 .product(productMapper.mapToResponse(creditAllInfoDto.getProduct()))

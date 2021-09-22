@@ -9,6 +9,7 @@ import springboot.credit.dto.CustomerDto;
 public class CustomerMapper {
 
     public CustomerDto mapToDto(CreditAllInfoRequest.Customer customer) {
+        if(customer == null) return null;
         return CustomerDto.builder()
                 .pesel(customer.getPesel())
                 .firstName(customer.getFirstName())
@@ -17,6 +18,7 @@ public class CustomerMapper {
     }
 
     public CreditAllInfoResponse.Customer mapToResponse(CustomerDto customerDto) {
+        if(customerDto == null) return null;
         return CreditAllInfoResponse.Customer.builder()
                 .firstName(customerDto.getFirstName())
                 .pesel(customerDto.getPesel())

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import springboot.credit.client.ProductClient;
 import springboot.credit.dto.ProductDto;
+import springboot.credit.exceptions.ResourceUnprocessable;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public class ProductService {
     public List<ProductDto> getProducts(List<Integer> creditsNumber) {
         return productClient.getProducts(creditsNumber);
     }
+
+
 }

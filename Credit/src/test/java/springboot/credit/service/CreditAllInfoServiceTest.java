@@ -30,16 +30,13 @@ class CreditAllInfoServiceTest {
     CreditAllInfoService creditAllInfoService;
 
     @MockBean
-    CreditService mockCreditInfo;
+    CreditService mockCredit;
 
     @MockBean
     ProductService mockProduct;
 
     @MockBean
     CustomerService mockCustomer;
-
-    @MockBean
-    NewCreditIdService mockNewId;
 
     @DisplayName("createCredit")
     @Nested
@@ -88,23 +85,21 @@ class CreditAllInfoServiceTest {
                     .findFirst()
                     .get();
 
-            Mockito.when(mockNewId.getNewCreditId())
+            Mockito.when(mockCredit.getNewCreditId())
                     .thenReturn(newCreditId);
         }
 
         @AfterEach
         void tearDown() {
-            Mockito.reset(mockCreditInfo);
+            Mockito.reset(mockCredit);
             Mockito.reset(mockCustomer);
             Mockito.reset(mockProduct);
-            Mockito.reset(mockNewId);
-
         }
 
         @Test
         void shouldCreateCostumerWithNewCreditId() {
             //when
-            creditAllInfoService.createCredit(creditAllInfoDto);
+            creditAllInfoService.createCreditInfo(creditAllInfoDto);
             //then
             Mockito.verify(mockCustomer).createCustomer(customerDtoWithNewId);
             assertThat(customerDtoWithNewId.getCreditId(), equalTo(newCreditId));
@@ -113,7 +108,7 @@ class CreditAllInfoServiceTest {
         @Test
         void shouldCreateProductWithNewCreditId() {
             //when
-            creditAllInfoService.createCredit(creditAllInfoDto);
+            creditAllInfoService.createCreditInfo(creditAllInfoDto);
             //then
             Mockito.verify(mockProduct).createProduct(productDtoWithNewId);
             assertThat(productDtoWithNewId.getCreditId(), equalTo(newCreditId));
@@ -122,16 +117,16 @@ class CreditAllInfoServiceTest {
         @Test
         void shouldCreateCreditInfoWithNewCreditId() {
             //when
-            creditAllInfoService.createCredit(creditAllInfoDto);
+            creditAllInfoService.createCreditInfo(creditAllInfoDto);
             //then
-            Mockito.verify(mockCreditInfo).saveCreditInfo(creditDtoWithNewId);
+            Mockito.verify(mockCredit).saveCreditInfo(creditDtoWithNewId);
             assertThat(creditDtoWithNewId.getId(), equalTo(newCreditId));
         }
 
         @Test
         void shouldReturnNewCreditId() {
             //when
-            Integer newCreditActual = creditAllInfoService.createCredit(creditAllInfoDto);
+            Integer newCreditActual = creditAllInfoService.createCreditInfo(creditAllInfoDto);
             //then
             assertThat(newCreditActual, equalTo(newCreditId));
         }
@@ -189,7 +184,7 @@ class CreditAllInfoServiceTest {
                     .build();
             creditAllInfoDtoList =  List.of(creditAllInfoDto);
 
-            Mockito.when(mockCreditInfo.getCreditInfos())
+            Mockito.when(mockCredit.getCreditInfos())
                     .thenReturn(creditDtoList);
 
             Mockito.when(mockCustomer.getCustomers(creditIdList))
@@ -201,7 +196,7 @@ class CreditAllInfoServiceTest {
 
         @AfterEach
         void tearDown() {
-            Mockito.reset(mockCreditInfo);
+            Mockito.reset(mockCredit);
             Mockito.reset(mockCustomer);
             Mockito.reset(mockProduct);
         }
@@ -209,7 +204,7 @@ class CreditAllInfoServiceTest {
         @Test
         void shouldGetCostumerListWithCreditId() {
             //when
-            creditAllInfoService.getAllCredits();
+            creditAllInfoService.getAllCreditsInfo();
             //then
             Mockito.verify(mockCustomer).getCustomers(creditIdList);
         }
@@ -217,7 +212,7 @@ class CreditAllInfoServiceTest {
         @Test
         void shouldGetProductListWithCreditId() {
             //when
-            creditAllInfoService.getAllCredits();
+            creditAllInfoService.getAllCreditsInfo();
             //then
             Mockito.verify(mockProduct).getProducts(creditIdList);
         }
@@ -225,15 +220,15 @@ class CreditAllInfoServiceTest {
         @Test
         void shouldGetAllCreditInfo() {
             //when
-            creditAllInfoService.getAllCredits();
+            creditAllInfoService.getAllCreditsInfo();
             //then
-            Mockito.verify(mockCreditInfo).getCreditInfos();
+            Mockito.verify(mockCredit).getCreditInfos();
         }
 
         @Test
         void shouldReturnAllCredits() {
             //when
-            List<CreditAllInfoDto> actualCreditAllInfoDtoList = creditAllInfoService.getAllCredits();
+            List<CreditAllInfoDto> actualCreditAllInfoDtoList = creditAllInfoService.getAllCreditsInfo();
             //then
             assertThat(actualCreditAllInfoDtoList, equalTo(creditAllInfoDtoList));
         }

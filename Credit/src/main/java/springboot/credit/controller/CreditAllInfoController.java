@@ -1,6 +1,8 @@
 package springboot.credit.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springboot.credit.controller.request.CreditAllInfoRequest;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/credit/", produces = "application/json")
+@Slf4j
 public class CreditAllInfoController {
     private final CreditAllInfoService creditAllInfoService;
     private final CreditMapper creditMapper;
@@ -23,17 +26,18 @@ public class CreditAllInfoController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreditNumberResponse createCredit(@RequestBody CreditAllInfoRequest credit) {
-        System.out.println(credit);
-        Integer neCreditId = creditAllInfoService.createCredit(creditMapper.map(credit));
+        log.info("POST on /credit/ {}" , credit.toString());
+        Integer newCreditId = creditAllInfoService.createCreditInfo(creditMapper.map(credit));
         return CreditNumberResponse.builder()
-                .creditId(neCreditId)
+                .creditId(newCreditId)
                 .build();
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public CreditAllInfoListResponse getCredits() {
-        List<CreditAllInfoResponse> creditAllInfoResponseList = creditAllInfoService.getAllCredits().stream()
+        log.info("GET on /credit/ ");
+        List<CreditAllInfoResponse> creditAllInfoResponseList = creditAllInfoService.getAllCreditsInfo().stream()
                 .map(creditMapper::map)
                 .collect(Collectors.toList());
 

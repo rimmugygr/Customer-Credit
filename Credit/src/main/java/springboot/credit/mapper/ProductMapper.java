@@ -9,6 +9,7 @@ import springboot.credit.dto.ProductDto;
 public class ProductMapper {
 
     public ProductDto mapToDto(CreditAllInfoRequest.Product product) {
+        if(product == null) return null;
         return ProductDto.builder()
                 .productName(product.getProductName())
                 .value(product.getValue())
@@ -16,6 +17,7 @@ public class ProductMapper {
     }
 
     public CreditAllInfoResponse.Product mapToResponse(ProductDto productDto) {
+        if(productDto == null) return null;
         return CreditAllInfoResponse.Product.builder()
                 .productName(productDto.getProductName())
                 .value(productDto.getValue())
