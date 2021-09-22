@@ -10,11 +10,11 @@ Make sure docker is up and running on your local machine
 1. Download the repo and execute the following commands in the same order
 2. Build the project
     ```shell script
-    $ mvn clean package -DskipTests
+    mvn clean package -DskipTests
       ```
 3. Build credit dockers images
     ```shell script
-    $ docker-compose up --force-recreate
+    docker-compose up --force-recreate
       ```   
 ## Technologies 
 1. Java 11
@@ -23,13 +23,13 @@ Make sure docker is up and running on your local machine
 4. MySQL database
 
 ## Sample use
-Add new credit:
+1. Add new credit:
 	GET
     ```shell script
-    $ http://localhost:8080/credit/
+    http://localhost:8080/credit/
       ```   
 	with JSON body:
-	```shell script
+    ```shell script
     $ {
     "credit" : {
         "creditName" : "Some credit name"
@@ -46,7 +46,7 @@ Add new credit:
 	}
       ```   
 	should return id of this credit
-	```shell script
+    ```shell script
     {
     "creditId": 1234567
 	}
