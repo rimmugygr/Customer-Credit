@@ -26,7 +26,7 @@ Date structure of consumer credit:
 
 ## How to Run?
 ### Run using docker(preferred) by docker-compose
-Make sure docker is up and running on your local machine
+Make sure docker is up and running on your local machine, and ports 8080, 8081, 8082, 3306  are free
 
 1. Download the repo and execute the following commands in the same order
 2. Build the project
@@ -37,7 +37,7 @@ Make sure docker is up and running on your local machine
     ```shell script
     docker-compose up --force-recreate
       ```   
-
+4. Beofre 
 ## Sample use
 Sample use by postman application:
 1. Add new credit:
