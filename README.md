@@ -52,6 +52,15 @@ http://localhost:8080/swagger-ui.html
 ```
 http://localhost:8090/
 ```
+User:
+```
+user
+```
+Password:
+```
+user
+```
+
 
 ## Sample use
 Sample use by postman application:
